@@ -40,7 +40,7 @@
             <!-- GPS 수집 버튼 (주소조회 통합 컴포넌트) -->
             <button type="button" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-3 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 border border-blue-200 active:scale-[0.99]">
                 <i class="fa-solid fa-location-crosshairs text-base animate-pulse"></i>
-                현재 위치(GPS) 자동 가져오기
+                현재 위치(GPS) 자동 가져오기</button><button type="button" id="retryAddrBtn" class="w-full mt-2 bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg border border-green-200">주소 재조회
             </button>
 
             <!-- 주소 매핑 결과 창 -->
@@ -52,7 +52,7 @@
                 <div class="border-t border-gray-200/60 my-1.5"></div>
                 <div class="flex justify-between items-start">
                     <span class="text-gray-400 w-16 font-medium">지번</span>
-                    <span class="text-gray-600 flex-1 text-xs font-mono"><span id="jibunAddr">지번을 불러오는 중...</span></span></div><div class="border-t border-gray-200/60 my-1.5"></div><div class="flex justify-between items-start"><span class="text-gray-400 w-16 font-medium">GPS</span><span class="text-gray-600 flex-1 text-xs font-mono"><span id="gpsCoord">GPS를 불러오는 중...</span></span>
+                    <span class="text-gray-600 flex-1 text-xs font-mono"><span id="jibunAddr">지번을 불러오는 중...</span></span></div><div class="border-t border-gray-200/60 my-1.5"></div><div class="flex justify-between items-start"><span class="text-gray-400 w-16 font-medium">GPS</span><span class="text-gray-600 flex-1 text-xs font-mono"><span id="gpsCoord">GPS를 불러오는 중...</span></span></div><div class="border-t border-gray-200/60 my-1.5"></div><div class="flex justify-between items-start"><span class="text-gray-400 w-16 font-medium">정확도</span><span class="text-gray-600 flex-1 text-xs font-mono"><span id="gpsAcc">-</span></span>
                 </div>
             </div>
         </section>
@@ -201,7 +201,7 @@ function refreshStats(){
     <span class="text-xs bg-gray-100 text-gray-700 font-bold px-2 py-1 rounded">No.${arr.length-i}</span>
     <span class="text-xs text-gray-500">${r.time}</span>
   </div>
-  <div class="text-sm font-medium text-gray-800">${r.address||'주소 없음'}</div>
+  <div class="text-sm font-medium text-gray-800">${r.address||'주소 없음'}<br><span style='font-size:12px;color:#666'>${r.jibun||''}</span></div>
 </div>
 <div class="text-right whitespace-nowrap">
   <span class="text-3xl font-black text-gray-900">${Number(r.depth).toFixed(2)}</span><span class="text-base font-bold"> m</span>
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   gpsBtn.addEventListener('click',()=>{
    if(!navigator.geolocation){alert('GPS를 지원하지 않습니다.');return;}
    navigator.geolocation.getCurrentPosition(pos=>{
-      currentLat=pos.coords.latitude.toFixed(6); currentLng=pos.coords.longitude.toFixed(6); currentAcc=Math.round(pos.coords.accuracy); if(typeof reverseGeocode==='function'){reverseGeocode(pos.coords.latitude,pos.coords.longitude);} alert(`GPS 취득 완료\n위도:${currentLat}\n경도:${currentLng}\n정확도:±${currentAcc}m`);
+      currentLat=pos.coords.latitude.toFixed(6); currentLng=pos.coords.longitude.toFixed(6); currentAcc=Math.round(pos.coords.accuracy); const a=document.getElementById('gpsAcc'); if(a)a.textContent='±'+currentAcc+'m'; if(typeof reverseGeocode==='function'){reverseGeocode(pos.coords.latitude,pos.coords.longitude);} alert(`GPS 취득 완료\n위도:${currentLat}\n경도:${currentLng}\n정확도:±${currentAcc}m`);
    },()=>alert('위치 권한을 허용해주세요.'));
   });
  }
@@ -518,6 +518,20 @@ document.addEventListener('DOMContentLoaded',()=>{
  }
 });
 </script>
-</body>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const retry=document.getElementById('retryAddrBtn');
+ if(retry){
+   retry.addEventListener('click',()=>{
+     if(currentLat && currentLng && typeof reverseGeocode==='function'){
+       reverseGeocode(Number(currentLat),Number(currentLng));
+       alert('주소를 다시 조회했습니다.');
+     }else{
+       alert('먼저 GPS를 취득하세요.');
+     }
+   });
+ }
+});
+</script></body>
 
 </html>
