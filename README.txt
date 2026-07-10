@@ -1,0 +1,1 @@
+Place your background video at video/hero.mp4 and upload project to GitHub Pages or Netlify.
